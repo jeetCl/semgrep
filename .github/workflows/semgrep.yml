@@ -1,10 +1,7 @@
 name: Semgrep Scan
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:   # Manual trigger
 
 jobs:
   semgrep:
