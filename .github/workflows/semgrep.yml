@@ -27,28 +27,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Semgrep
+      - name: Install Semgrep (Pro/CI)
         run: |
-          python -m pip install --upgrade pip
-          pip install semgrep
+          curl -s https://semgrep.dev/install.sh | bash
 
       - name: Run Semgrep Scan and Upload to Semgrep Cloud
         run: |
           echo "Reason: ${{ github.event.inputs.reason }}"
           # Scan and upload to Semgrep Cloud
-          semgrep \
+          semgrep scan \
             --config=auto \
             --json \
             --output=semgrep.json \
             --upload
 
           # Run again to generate SARIF for GitHub Code Scanning
-          semgrep \
+          semgrep scan \
             --config=auto \
             --sarif \
             --output=semgrep.sarif
