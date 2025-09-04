@@ -16,17 +16,23 @@ on:
 
 jobs:
   semgrep:
+    name: Run Semgrep Scan
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # Needed for uploading SARIF to GitHub code scanning
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Semgrep scan using rules from Semgrep Cloud
+      - name: Run Semgrep Scan using Semgrep Cloud Rules
         uses: returntocorp/semgrep-action@v1
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
