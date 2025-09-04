@@ -1,4 +1,4 @@
-name: Semgrep SAST Scan  # This shows in the GitHub Actions UI
+name: Semgrep SAST Scan
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: '0 3 * * 1'  # Every Monday at 3AM UTC
   workflow_dispatch:
     inputs:
       reason:
@@ -21,7 +21,7 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # Required for uploading SARIF to GitHub
 
     steps:
       - name: Checkout code
@@ -39,12 +39,19 @@ jobs:
 
       - name: Run Semgrep Scan and Upload to Semgrep Cloud
         run: |
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          # Scan and upload to Semgrep Cloud
           semgrep \
             --config=auto \
             --json \
             --output=semgrep.json \
-            --sarif --output=semgrep.sarif \
             --upload
+
+          # Run again to generate SARIF for GitHub Code Scanning
+          semgrep \
+            --config=auto \
+            --sarif \
+            --output=semgrep.sarif
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         continue-on-error: true
