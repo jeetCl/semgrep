@@ -21,7 +21,7 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write  # Needed for uploading SARIF to GitHub code scanning
+      security-events: write
 
     steps:
       - name: Checkout code
