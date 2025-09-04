@@ -5,17 +5,25 @@ on:
     branches:
       - main
   pull_request:
-  workflow_dispatch:
 
 jobs:
   semgrep:
     runs-on: ubuntu-latest
 
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Semgrep and Upload to Semgrep Cloud
-        uses: returntocorp/semgrep-action@v1
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        run: semgrep --config=p/ci --token=$SEMGREP_APP_TOKEN
