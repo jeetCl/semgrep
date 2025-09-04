@@ -20,31 +20,15 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write  # For uploading SARIF to GitHub
+      security-events: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Semgrep CLI
-        run: |
-          curl -L -o semgrep.tar.gz https://github.com/returntocorp/semgrep/releases/latest/download/semgrep-linux-amd64.tar.gz
-          tar -xzf semgrep.tar.gz
-          chmod +x semgrep
-          sudo mv semgrep /usr/local/bin/
-
-      - name: Run Semgrep Scan and Upload to Semgrep Cloud
-        run: |
-          echo "Reason: ${{ github.event.inputs.reason }}"
-
-          # Run with Semgrep Cloud rules (no --config)
-          semgrep ci --json --output=semgrep.json --upload
-          semgrep ci --sarif --output=semgrep.sarif
+      - name: Run Semgrep scan with Semgrep Action
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        continue-on-error: true
-
-      - name: Upload SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
