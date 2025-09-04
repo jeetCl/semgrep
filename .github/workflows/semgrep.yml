@@ -2,25 +2,19 @@ name: Semgrep Scan
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
 jobs:
   semgrep:
-    name: Run Semgrep
+    name: Run Semgrep Scan
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python (optional, required for local rule evaluation)
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-
-      - name: Run Semgrep
+      - name: Run Semgrep with Cloud Upload
         uses: returntocorp/semgrep-action@v1
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
