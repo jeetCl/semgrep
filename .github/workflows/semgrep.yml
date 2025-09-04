@@ -2,7 +2,8 @@ name: Semgrep Scan
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -15,6 +16,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Semgrep and Upload to Semgrep Cloud
-        uses: returntocorp/semgrep-action@v2.2.0
+        uses: returntocorp/semgrep-action@v1
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
