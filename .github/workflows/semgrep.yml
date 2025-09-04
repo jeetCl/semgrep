@@ -1,4 +1,4 @@
-name: Semgrep SAST Scan
+name: Semgrep SAST Scan  # This shows in the GitHub Actions UI
 
 on:
   push:
@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 3 * * 1'
   workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual scan'
+        required: false
+        default: 'Manual trigger by user'
 
 jobs:
   semgrep:
@@ -32,8 +37,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install semgrep
 
-      - name: Run Semgrep Scan
-        run: semgrep --config=auto --sarif --output=semgrep.sarif
+      - name: Run Semgrep Scan and Upload to Semgrep Cloud
+        run: |
+          semgrep \
+            --config=auto \
+            --json \
+            --output=semgrep.json \
+            --sarif --output=semgrep.sarif \
+            --upload
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         continue-on-error: true
 
       - name: Upload SARIF to GitHub Code Scanning
