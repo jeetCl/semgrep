@@ -16,41 +16,25 @@ on:
 
 jobs:
   semgrep:
-    name: Run Semgrep Scan
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
-      security-events: write  # Required for uploading SARIF to GitHub
+      security-events: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Semgrep (Pro/CI)
-        run: |
-          curl -s https://semgrep.dev/install.sh | bash
-
-      - name: Run Semgrep Scan and Upload to Semgrep Cloud
-        run: |
-          echo "Reason: ${{ github.event.inputs.reason }}"
-          # Scan and upload to Semgrep Cloud
-          semgrep scan \
-            --config=auto \
-            --json \
-            --output=semgrep.json \
-            --upload
-
-          # Run again to generate SARIF for GitHub Code Scanning
-          semgrep scan \
-            --config=auto \
-            --sarif \
-            --output=semgrep.sarif
+      - name: Run Semgrep scan with Semgrep Action
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        continue-on-error: true
 
       - name: Upload SARIF to GitHub Code Scanning
+        if: always()  # run even if previous step fails
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
