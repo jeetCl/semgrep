@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1'  # Runs weekly on Monday at 3AM UTC
+    - cron: '0 3 * * 1'
 
 jobs:
   semgrep:
@@ -15,13 +15,13 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write  # Needed for uploading to Code Scanning
+      security-events: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python (for Semgrep)
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -31,9 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install semgrep
 
-      - name: Run Semgrep Scan
+      - name: Run Semgrep with Upload
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
-          semgrep --config=auto --sarif --output=semgrep.sarif || true
+          semgrep --config=auto --sarif --output=semgrep.sarif --upload || true
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
