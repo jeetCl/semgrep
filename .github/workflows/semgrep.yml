@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: '0 3 * * 1'  # Every Monday at 3:00 AM UTC
 
 jobs:
   semgrep:
